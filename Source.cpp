@@ -9,7 +9,8 @@ public:
 	~CReteaException() { mesaj = ""; }
 	string getmsj() { return mesaj; }
 };
-class Retea;
+///-------------------------------
+class Retea; // predefinim clasa retea pentru a putea utiliza un obiect de tip retea in definitia unei metoda din clasa Calculator
 class Calculator {
 protected:
 	string* ms;
@@ -60,6 +61,7 @@ Calculator::~Calculator()
 	IP.clear();
 	nume.clear();
 }
+///-------------------------------
 class Server : public Calculator {
 	int nracces;
 	Calculator* accesserv;
@@ -67,7 +69,7 @@ public:
 	Server(string addnume = "", string addIP = "");
 	void permitStation(Calculator& c);
 	void listStation();
-	string type() override { return "Server"; }
+	string type()  { return "Server"; }
 	~Server();
 };
 Server::Server(string addnume, string addIP) :Calculator(addnume, addIP)
@@ -92,6 +94,7 @@ Server::~Server()
 	nracces = 0;
 	delete[] accesserv;
 }
+///-------------------------------
 class Retea : public Calculator {
 	Calculator* calc;
 	string* tip;
@@ -105,7 +108,7 @@ public:
 	Retea& operator +(Retea& r);
 	Retea& operator =(Retea& r);
 	~Retea();
-	friend class Calculator;
+	friend class Calculator; ///clasa prietena cu calculator pentru a putea accesa datele private in scopul metodei listServers
 };
 Retea::Retea(string addname) : Calculator(addname)
 {
@@ -124,14 +127,18 @@ void Retea::addStation(Calculator& c)
 }
 void Retea::listStations()
 {
-	string fisierout;
-	cin >> fisierout;
-	ofstream g(fisierout);
+	/*char fisierout[101];
+	cin >> fisierout;               ///afisarea intr-un fisier citit de la tastatura(cum cere enuntul)
+	ofstream g(fisierout);*/
+	///dar, pentru lejeritatea corecturii am afisat in consola
 	for (int i = 0; i < nrcalc; i++)
 	{
-		g << calc[i];
-		g << " Tip:";
-		g << tip[i] << '\n';
+	    cout << calc[i];
+		cout << " Tip:";
+		cout << tip[i] << '\n';
+		/*g << calc[i];
+		g << " Tip:";               ///pentru afisarea in fisier
+		g << tip[i] << '\n';*/
 	}
 }void Retea::removeStation(Calculator& c)
 {
@@ -142,7 +149,7 @@ void Retea::listStations()
 			poz = i;
 	}
 	if (poz == -1)
-		throw(CReteaException("Station was not found\n"));
+		throw(CReteaException("Station not found\n"));
 	for (int i = poz; i < nrcalc - 1; i++)
 	{
 		calc[i] = calc[i + 1];
@@ -180,7 +187,7 @@ Retea& Retea::operator=(Retea& R)
 		this->calc[i] = R.calc[i], this->tip[i] = R.tip[i];
 	return *this;
 }
-void Calculator::listServers(Retea& R)
+void Calculator::listServers(Retea& R) ///metoda descrisa in clasa calculator de cautare a serverelor din retea care sunt legate la un anumit calculator
 {
 	for (int i = 0; i < R.nrcalc; i++)
 		if (R.tip[i] == "Server")
@@ -196,7 +203,9 @@ Retea::~Retea()
 }
 int main()
 {
-    /* try {
+    ///exemplu enunt
+    /*
+     try {
 		Retea  R1("Reteaua 1"); // constructorul primeste numele retelei
 		Calculator C1("calculatorul 1", "172.16.100.101");
 		Calculator C2("calculatorul 2 ", "172.16.100.102");
@@ -210,27 +219,23 @@ int main()
 		R1.addStation(C2);
 		R1.addStation(C4);
 		R1.addStation(S2);
-
 		S1.permitStation(C1);
 		S1.permitStation(C1);
 		S1.permitStation(C3);
-
 		S2.permitStation(C1);
-
-		R1.listStations(); // afiseaza lista calculatoarelor din retea
+		R1.listStations(); /// afiseaza lista calculatoarelor din retea(se afiseaza in consola pentru lejeritate, a se citi metoda listStation pentru
+                           /// a se face afisarea si in fisier (ca in enunt)
 		cout << endl;
 		C1.listServers(R1); // afiseaza informatiile despre serverele S1 si S2
 		cout << endl;
 		R1.removeStation(S2);
 		C1.listServers(R1); // afiseaza informatiile doar despre serverul S1
-
-
 	}
 	catch (CReteaException & e) {
 		e.getmsj();
 	}*/
-	
-	//exemplu (+)
+
+	///testare operatie + intre Retele
 	/*try{
 	Calculator c1( "alfa","1"), c2("beta","2"), c3("dorel","3"), c4("gigel","4"), c5("john","5");
 	Server s1("sfa","6"), s2("2131as","7"), s3("af3qa","8"), s4("Asdsd","9");
@@ -241,23 +246,26 @@ int main()
 	R.addStation(c3);
 	R.addStation(s1);
 	R.addStation(s2);
-	R.listStations();
+	R.listStations(); //afisam informatii despre c1 c2 c3 s1 s2
+	cout<<endl;
 	//dupa stergere
 	R.removeStation(c3);
 	R.removeStation(s2);
-	R.listStations();
+	R.listStations(); //cum am ster pe c3 si s2 afisam informatii despre c1 c2 s1
+	cout<<endl;
 	Retea R2;
 	R2.addStation(c4);
 	R2.addStation(c5);
 	R2.addStation(s3);
 	R2.addStation(s4);
 	//Retea2
-	R2.listStations();
+	R2.listStations(); //afisam informatii despre c4 c5 s3 s4
+	cout<<endl;
 	Retea R3;
 	R3 = R + R2;
 	//Retea3
-	R3.listStations();}
-	catch (CReteaException & e) {
+	R3.listStations(); //afisam informatii desre c1 c2 s1 c4 c5 s3 s4
+	} catch (CReteaException & e) {
 		e.getmsj();
 	}*/
 
